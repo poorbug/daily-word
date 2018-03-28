@@ -59,7 +59,9 @@
     "webpack": "^2.6.1",
     "webpack-dev-middleware-hard-disk": "^1.10.0",
     "webpack-merge": "^4.1.0",
-    "postcss-loader": "^2.0.6"
+    "postcss-loader": "^2.0.6",
+    "less": "^2.7.2",
+    "less-loader": "^4.0.4"
   },
   "engines": {
     "node": ">= 4.0.0",

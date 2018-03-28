@@ -57,9 +57,18 @@ module.exports = {
         }
       },
       {
-        test: /\.vue$/,
+        test: /\.(vue)$/,
         loader: 'mpvue-loader',
         options: vueLoaderConfig
+      },
+      {
+        test: /\.(less)$/,
+        loader: 'less-loader',
+        options: {
+          loaders: {
+            'less': 'vue-style-loader!css-loader!less-loader'
+          }
+        }
       },
       {
         test: /\.js$/,
