@@ -7,16 +7,18 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
   state: {
-    count: 0
+    list: [],
+    id: ''
   },
   mutations: {
-    increment: (state) => {
-      const obj = state
-      obj.count += 1
+    setOpenId: (state, id) => {
+      state.openid = id
     },
-    decrement: (state) => {
-      const obj = state
-      obj.count -= 1
+    setList: (state, list) => {
+      state.list = list
+    },
+    push: (state, o) => {
+      state.list.push(o)
     }
   }
 })

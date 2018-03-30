@@ -12,9 +12,13 @@ export function formatTime (date) {
   const minute = date.getMinutes()
   const second = date.getSeconds()
 
-  const t1 = [year, month, day].map(formatNumber).join('/')
+  const t1 = [year, month, day].map(formatNumber).join('.')
   const t2 = [hour, minute, second].map(formatNumber).join(':')
 
   return `${t1} ${t2}`
 }
 
+export function formatWeek (date) {
+  const WEEK = ['', '一', '二', '三', '四', '五', '六', '日']
+  return `周${WEEK[date.getDay()]}`
+}

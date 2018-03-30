@@ -1,12 +1,15 @@
 <script>
+import store from './store'
+import { CLIENT_ID } from './constant'
+
 export default {
   created () {
-    // 调用API从本地缓存中获取数据
-    const logs = wx.getStorageSync('logs') || []
-    logs.unshift(Date.now())
-    wx.setStorageSync('logs', logs)
-
-    console.log('app created and cache logs by setStorageSync')
+    wx.BaaS = requirePlugin('minapp')
+    wx.BaaS.wxExtend(wx.login, wx.getUserInfo)
+    wx.BaaS.init(CLIENT_ID)
+    wx.BaaS.login().then(res => {
+      store.commit('setOpenId', res.openid)
+    })
   }
 }
 </script>
