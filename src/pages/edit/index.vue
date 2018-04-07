@@ -31,7 +31,7 @@ export default {
       return formatWeek(this.today)
     },
     formatTime () {
-      return formatTime(this.today)
+      return formatTime(this.today, false)
     }
   },
 
@@ -65,5 +65,4 @@ export default {
 
 <style lang="less">
 @import './style.less';
-
 </style>

@@ -1,8 +1,8 @@
 <template>
   <div class="home">
     <ul class="word-list">
-        <li v-for="(o, i) in words" :key="i">
-          <word :text="o.txt" :date="o.created_at"/>
+        <li v-for="(o, i) in list" :key="i">
+          <word :text="o.txt" :date="o.created_at" :classes="sameClasses(i)" />
         </li>
     </ul>
     <a href="/pages/edit/main" class="write" >+</a>
@@ -10,22 +10,21 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import word from '@/components/word'
 
 import store from '../../store'
-import { TABLE_ID } from '../../constant/'
+import { TABLE_ID, SAME_YESTODAY } from '../../constant/'
 
 export default {
+  store,
   components: {
     word
   },
-
   data () {
     return {
-      // words: store.state.words
     }
   },
-
   created () {
     let query = new wx.BaaS.Query()
     query.compare('openid', '=', wx.BaaS.storage.get('userinfo').openid)
@@ -39,10 +38,17 @@ export default {
       })
     })
   },
-
   computed: {
-    words () {
-      return store.state.list
+    ...mapState([ 'list' ])
+  },
+  methods: {
+    sameClasses (todayIndex) { // mapState 则不能用箭头表达式，否则取不到 this.list
+      if (todayIndex === 0) return SAME_YESTODAY.NEITHER // 年的第一天，也是月的第一天
+      const prev = new Date(this.list[todayIndex - 1].created_at * 1000)
+      const today = new Date(this.list[todayIndex].created_at * 1000)
+      if (prev.getFullYear() !== today.getFullYear()) return SAME_YESTODAY.NEITHER
+      if (prev.getMonth() !== today.getMonth()) return SAME_YESTODAY.YEAR
+      return SAME_YESTODAY.BOTH
     }
   }
 }
@@ -50,5 +56,4 @@ export default {
 
 <style lang="less">
 @import './style.less';
-
 </style>

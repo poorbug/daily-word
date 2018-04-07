@@ -4,21 +4,7 @@
     .word-list {
         display: flex;
         flex-direction: column;
-        padding: 40rpx;
-        > li {
-            position: relative;
-            & + li {
-                margin-top: 40rpx;
-                &::before {
-                    content: '';
-                    border-left: 1px solid #ccc;
-                    height: 40rpx;
-                    position: absolute;
-                    top: -40rpx;
-                    left: 48rpx;
-                }
-            }
-        }
+        padding: 0 40rpx 140rpx 40rpx;
     }
     .write {
         width: 80rpx;
@@ -27,7 +13,7 @@
         position: fixed;
         bottom: 40rpx;
         right: 40rpx;
-        background-color: #65b74e;
+        background-color: @green;
         color: white;
         font-size: 56rpx;
         text-align: center;

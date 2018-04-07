@@ -24,7 +24,6 @@
                 flex-basis: 128rpx;
                 flex-grow: 0;
                 flex-shrink: 0;
-
             }
             &:last-child {
                 flex-basis: 0;
@@ -39,6 +38,9 @@
         box-sizing: border-box;
     }
     > button {
-        border-radius: 0;
+        border-radius: 0 !important;
+        &::after {
+            border: none;
+        }
     }
 }
