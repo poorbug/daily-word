@@ -8,11 +8,11 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
   state: {
     list: [],
-    id: ''
+    user: {}
   },
   mutations: {
-    setOpenId: (state, id) => {
-      state.openid = id
+    setUser: (state, user) => {
+      state.user = user
     },
     setList: (state, list) => {
       state.list = list

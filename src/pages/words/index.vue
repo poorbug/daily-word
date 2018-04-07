@@ -1,6 +1,10 @@
 <template>
   <div class="home">
-    <ul class="word-list">
+    <div v-if="list.length === 0" class="userinfo">
+      <img :src="user.avatarUrl" background-size="cover" />
+      <p>快来写一个吧～</p>
+    </div>
+    <ul class="word-list" v-else>
         <li v-for="(o, i) in list" :key="i">
           <word :text="o.txt" :date="o.created_at" :classes="sameClasses(i)" />
         </li>
@@ -39,7 +43,7 @@ export default {
     })
   },
   computed: {
-    ...mapState([ 'list' ])
+    ...mapState([ 'list', 'user' ])
   },
   methods: {
     sameClasses (todayIndex) { // mapState 则不能用箭头表达式，否则取不到 this.list

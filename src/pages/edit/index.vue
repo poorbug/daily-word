@@ -22,7 +22,7 @@ export default {
   data () {
     return {
       txt: '',
-      today: new Date()
+      today: Math.floor(new Date().getTime() / 1000)
     }
   },
 

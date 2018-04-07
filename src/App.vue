@@ -8,7 +8,7 @@ export default {
     wx.BaaS.wxExtend(wx.login, wx.getUserInfo)
     wx.BaaS.init(CLIENT_ID)
     wx.BaaS.login().then(res => {
-      store.commit('setOpenId', res.openid)
+      store.commit('setUser', res)
     })
   }
 }
