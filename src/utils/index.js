@@ -1,34 +1,50 @@
-function formatNumber (n) {
-  const str = n.toString()
-  return str[1] ? str : `0${str}`
+export const showErr = (msg) => {
+  wx.showToast({
+    title: msg || '出错了～',
+    duration: 2000
+  })
 }
 
-export function formatTime (date, withTime) {
-  date = new Date(date * 1000)
-  const year = date.getFullYear()
-  const month = date.getMonth() + 1
-  const day = date.getDate()
+export const getCoordinate = (m) => ({
+  longitude: m.coordinate.coordinates[0],
+  latitude: m.coordinate.coordinates[1]
+})
 
-  const hour = date.getHours()
-  const minute = date.getMinutes()
-  const second = date.getSeconds()
+export const getCoordinates = (list) => (list.map(e => (getCoordinate(e))))
 
-  const t1 = [year, month, day].map(formatNumber).join('.')
-  const t2 = [hour, minute, second].map(formatNumber).join(':')
+export const calcCenter = (list) => {
+  const x = list.reduce((sum, e) => (sum + e.longitude), 0) / list.length
+  const y = list.reduce((sum, e) => (sum + e.latitude), 0) / list.length
 
-  return withTime ? `${t1} ${t2}` : t1
+  return {
+    longitude: x,
+    latitude: y,
+    ...centerAttr
+  }
 }
 
-export function formatWeek (date) {
-  const WEEK = ['', '一', '二', '三', '四', '五', '六', '日']
-  return `周${WEEK[new Date(date * 1000).getDay()]}`
+export const calcLines = (list, center) => {
+  const { longitude, latitude } = center
+  return list.map(e => {
+    return {
+      points: [
+        {
+          longitude: e.longitude,
+          latitude: e.latitude
+        },
+        {
+          longitude,
+          latitude
+        }
+      ],
+      color: '#00ff00',
+      width: 2
+    }
+  })
 }
 
-export function formatMonth (date) {
-  const MONTH = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二']
-  return `${MONTH[new Date(date * 1000).getMonth()]}月`
-}
-
-export function formatYear (date) {
-  return new Date(date * 1000).getFullYear()
+const centerAttr = {
+  iconPath: require('../static/image/people.png'),
+  width: 30,
+  height: 30
 }

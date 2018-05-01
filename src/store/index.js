@@ -8,7 +8,8 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
   state: {
     list: [],
-    user: {}
+    user: {},
+    activity: null
   },
   mutations: {
     setUser: (state, user) => {
@@ -17,8 +18,8 @@ const store = new Vuex.Store({
     setList: (state, list) => {
       state.list = list
     },
-    push: (state, o) => {
-      state.list.push(o)
+    setActivity: (state, activity) => {
+      state.activity = activity
     }
   }
 })
