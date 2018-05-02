@@ -27,7 +27,8 @@ export default {
       controls: [],
       people: 0,
       name: '',
-      isCreator: false
+      isCreator: false,
+      isJoined: false
     }
   },
   onShareAppMessage (res) {
@@ -73,32 +74,51 @@ export default {
       }, () => { showErr('获取成员出错') })
     },
     async renderControl (members) {
-      const joined = await members.some(e => (e.user_id === this.user.openid))
-      wx.getSystemInfo({
-        success: (res) => {
-          this.controls = [{
-            id: joined ? 2 : 1,
-            iconPath: joined ? unjoinImg : joinImg,
-            position: {
-              left: res.windowWidth - 20 - 40,
-              top: res.windowHeight - 20 - 40,
-              width: 40,
-              height: 40
-            },
-            clickable: true
-          }]
-        }
-      })
+      this.isJoined = await members.some(e => (e.user_id === this.user.openid))
+      this.rerenderControls()
     },
     join () {
-      console.log(1)
+      this.saveMyActivity()
+      this.saveActivityMember()
     },
     unjoin () {
       if (this.isCreator) {
         showErr('你是创建者!')
         return
       }
-      console.log(2)
+      // 删除
+    },
+    saveMyActivity () {
+      const activityId = this.$root.$mp.query.id
+      const myActivityTable = new wx.BaaS.TableObject(TABLE_ID.MY_ACTIVITY)
+      const myActivity = {
+        user_id: this.user.openid,
+        activity_id: activityId
+      }
+      myActivityTable.create().set(myActivity).save().then(res => {
+        console.log(1, res)
+      }, err => { showErr(err.toString()) })
+    },
+    saveActivityMember () {
+      wx.getLocation({
+        type: 'gcj02',
+        success: (res) => {
+          const latitude = res.latitude
+          const longitude = res.longitude
+
+          const activityId = this.$root.$mp.query.id
+          const activityMemberTable = new wx.BaaS.TableObject(TABLE_ID.ACTIVITY_MEMBER)
+          const activityMember = {
+            user_id: this.user.openid,
+            activity_id: activityId,
+            coordinate: new wx.BaaS.GeoPoint(longitude, latitude)
+          }
+          activityMemberTable.create().set(activityMember).save().then(res => {
+            this.isJoined = true
+            this.rerenderControls()
+          }, err => { showErr(err.toString()) })
+        }
+      })
     },
     controlTap (e) {
       switch (e.mp.controlId) {
@@ -110,6 +130,23 @@ export default {
           break
         default:
       }
+    },
+    rerenderControls () {
+      wx.getSystemInfo({
+        success: (res) => {
+          this.controls = [{
+            id: this.isJoined ? 2 : 1,
+            iconPath: this.isJoined ? unjoinImg : joinImg,
+            position: {
+              left: res.windowWidth - 20 - 40,
+              top: res.windowHeight - 20 - 40,
+              width: 40,
+              height: 40
+            },
+            clickable: true
+          }]
+        }
+      })
     }
   }
 }

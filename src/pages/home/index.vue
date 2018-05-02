@@ -38,6 +38,7 @@ export default {
     }
   },
   created () {
+    console.log(this.user)
     this.getActivityIDs()
   },
   computed: {
@@ -51,7 +52,7 @@ export default {
       Product.setQuery(query).find().then(res => {
         const ids = res.data.objects.map(e => e.activity_id)
         this.getActivitys(ids)
-      }, err => { showErr(err) })
+      }, err => { showErr(err.toString()) })
     },
     getActivitys (ids) {
       let query = new wx.BaaS.Query()
@@ -59,7 +60,7 @@ export default {
       let Product = new wx.BaaS.TableObject(TABLE_ID.ACTIVITY)
       Product.setQuery(query).find().then(res => {
         store.commit('setList', res.data.objects)
-      }, err => { showErr(err) })
+      }, err => { showErr(err.toString()) })
     },
     inputName () {
       this.showInputer = true
@@ -90,7 +91,7 @@ export default {
         wx.navigateTo({
           url: `/pages/map/main?id=${res.data.id}`
         })
-      }, err => { showErr(err) })
+      }, err => { showErr(err.toString()) })
     },
     saveMyActivity (activityId) {
       const myActivityTable = new wx.BaaS.TableObject(TABLE_ID.MY_ACTIVITY)
@@ -100,7 +101,7 @@ export default {
       }
       myActivityTable.create().set(myActivity).save().then(res => {
         console.log(1, res)
-      }, err => { showErr(err) })
+      }, err => { showErr(err.toString()) })
     },
     saveActivityMember (activityId, coordinate) {
       const activityMemberTable = new wx.BaaS.TableObject(TABLE_ID.ACTIVITY_MEMBER)
@@ -111,7 +112,7 @@ export default {
       }
       activityMemberTable.create().set(activityMember).save().then(res => {
         console.log(2, res)
-      }, err => { showErr(err) })
+      }, err => { showErr(err.toString()) })
     },
     closeInputer () {
       this.name = ''

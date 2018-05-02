@@ -1,6 +1,7 @@
 export const showErr = (msg) => {
   wx.showToast({
     title: msg || '出错了～',
+    icon: 'none',
     duration: 2000
   })
 }
