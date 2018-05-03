@@ -28,7 +28,8 @@ export default {
       people: 0,
       name: '',
       isCreator: false,
-      isJoined: false
+      isJoined: false,
+      memberRecordId: 0
     }
   },
   onShareAppMessage (res) {
@@ -78,45 +79,26 @@ export default {
       this.rerenderControls()
     },
     join () {
-      this.saveMyActivity()
-      this.saveActivityMember()
+      store.dispatch('saveMember', {
+        activityId: this.$root.$mp.query.id,
+        callback: () => {
+          this.isJoined = true
+          this.rerenderControls()
+        }
+      })
     },
     unjoin () {
-      if (this.isCreator) {
-        showErr('你是创建者!')
-        return
-      }
+      // if (this.isCreator) {
+      //   showErr('你是创建者!')
+      //   return
+      // }
       // 删除
-    },
-    saveMyActivity () {
-      const activityId = this.$root.$mp.query.id
-      const myActivityTable = new wx.BaaS.TableObject(TABLE_ID.MY_ACTIVITY)
-      const myActivity = {
-        user_id: this.user.openid,
-        activity_id: activityId
-      }
-      myActivityTable.create().set(myActivity).save().then(res => {
-        console.log(1, res)
-      }, err => { showErr(err.toString()) })
-    },
-    saveActivityMember () {
-      wx.getLocation({
-        type: 'gcj02',
-        success: (res) => {
-          const latitude = res.latitude
-          const longitude = res.longitude
-
-          const activityId = this.$root.$mp.query.id
-          const activityMemberTable = new wx.BaaS.TableObject(TABLE_ID.ACTIVITY_MEMBER)
-          const activityMember = {
-            user_id: this.user.openid,
-            activity_id: activityId,
-            coordinate: new wx.BaaS.GeoPoint(longitude, latitude)
-          }
-          activityMemberTable.create().set(activityMember).save().then(res => {
-            this.isJoined = true
-            this.rerenderControls()
-          }, err => { showErr(err.toString()) })
+      store.dispatch('delMember', {
+        activityId: this.$root.$mp.query.id,
+        callback: () => {
+          this.isJoined = false
+          this.rerenderControls()
+          wx.navigateBack()
         }
       })
     },
