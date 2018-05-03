@@ -52,9 +52,6 @@ export default {
       this.showInputer = false
     },
     add () {
-      this.saveActivity()
-    },
-    saveActivity () {
       const activity = {
         name: this.name,
         creator_id: this.user.openid,

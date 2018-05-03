@@ -36,11 +36,12 @@ const store = new Vuex.Store({
     saveMember ({ state }, { activityId, callback }) {
       wx.getLocation({
         type: 'gcj02',
-        success: ({ latitude, longitude }) => {
+        success: (res) => {
+          console.log('wx.getLocation: ', res)
           const activityMember = {
             user_id: state.user.openid,
             activity_id: activityId,
-            coordinate: new wx.BaaS.GeoPoint(longitude, latitude)
+            coordinate: new wx.BaaS.GeoPoint(res.longitude, res.latitude)
           }
           new wx.BaaS.TableObject(TABLE_ID.ACTIVITY_MEMBER).create().set(activityMember).save().then(res => {
             console.log('saveMember success: ', res)

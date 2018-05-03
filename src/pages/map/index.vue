@@ -28,18 +28,15 @@ export default {
       people: 0,
       name: '',
       isCreator: false,
-      isJoined: false,
-      memberRecordId: 0
+      isJoined: undefined
     }
   },
   onShareAppMessage (res) {
     return {
       title: `[ ${this.name} ] 来聚不`,
       path: `/pages/map/main?id=${this.$root.$mp.query.id}`,
-      success: (res) => {
-      },
-      fail: (res) => {
-      }
+      success: (res) => {},
+      fail: (res) => {}
     }
   },
   mounted () {
@@ -51,8 +48,9 @@ export default {
   },
   methods: {
     getActivity () {
-      let Product = new wx.BaaS.TableObject(TABLE_ID.ACTIVITY)
-      Product.get(this.$root.$mp.query.id).then(res => {
+      console.log('getActivity')
+      console.log(this)
+      new wx.BaaS.TableObject(TABLE_ID.ACTIVITY).get(this.$root.$mp.query.id).then(res => {
         this.name = res.data.name
         if (this.user.openid === res.data.creator_id) this.isCreator = true
         wx.setNavigationBarTitle({
@@ -61,43 +59,40 @@ export default {
         this.people = res.data.people_amount
       }, () => { showErr('获取活动出错') })
     },
-    getActivityMembers (id) {
-      let query = new wx.BaaS.Query()
+    async getActivityMembers () {
+      console.log('getActivityMember')
+      const query = new wx.BaaS.Query()
       query.compare('activity_id', '=', this.$root.$mp.query.id)
-      let Product = new wx.BaaS.TableObject(TABLE_ID.ACTIVITY_MEMBER)
-      Product.setQuery(query).find().then(res => {
+      new wx.BaaS.TableObject(TABLE_ID.ACTIVITY_MEMBER).setQuery(query).find().then(res => {
         const members = res.data.objects
-        this.renderControl(members)
+        this.isJoined = members.some(e => (e.user_id === this.user.openid))
+        this.renderControls(members.some(e => (e.user_id === this.user.openid)))
+        console.log('isJoined: ', members.some(e => (e.user_id === this.user.openid)))
         const coors = getCoordinates(members)
         const center = calcCenter(coors)
         this.markers = coors.length === 1 ? coors : coors.concat(center)
         this.polylines = calcLines(coors, center)
       }, () => { showErr('获取成员出错') })
     },
-    async renderControl (members) {
-      this.isJoined = await members.some(e => (e.user_id === this.user.openid))
-      this.rerenderControls()
-    },
     join () {
       store.dispatch('saveMember', {
         activityId: this.$root.$mp.query.id,
         callback: () => {
           this.isJoined = true
-          this.rerenderControls()
+          this.renderControls(true)
         }
       })
     },
     unjoin () {
-      // if (this.isCreator) {
-      //   showErr('你是创建者!')
-      //   return
-      // }
-      // 删除
+      if (this.isCreator) {
+        showErr('你是创建者!')
+        return
+      }
       store.dispatch('delMember', {
         activityId: this.$root.$mp.query.id,
         callback: () => {
           this.isJoined = false
-          this.rerenderControls()
+          this.renderControls(false)
           wx.navigateBack()
         }
       })
@@ -113,12 +108,13 @@ export default {
         default:
       }
     },
-    rerenderControls () {
+    renderControls (val) {
+      console.log('render: ', val)
       wx.getSystemInfo({
         success: (res) => {
           this.controls = [{
-            id: this.isJoined ? 2 : 1,
-            iconPath: this.isJoined ? unjoinImg : joinImg,
+            id: val ? 2 : 1,
+            iconPath: val ? unjoinImg : joinImg,
             position: {
               left: res.windowWidth - 20 - 40,
               top: res.windowHeight - 20 - 40,
@@ -131,6 +127,28 @@ export default {
       })
     }
   }
+  // watch: {
+  //   isJoined: function (val) {
+  //     console.log('watch: ', val)
+  //     wx.getSystemInfo({
+  //       success: (res) => {
+  //         console.log('watch res: ', res)
+  //         console.log('watch this: ', this)
+  //         this.controls = [{
+  //           id: val ? 2 : 1,
+  //           iconPath: val ? unjoinImg : joinImg,
+  //           position: {
+  //             left: res.windowWidth - 20 - 40,
+  //             top: res.windowHeight - 20 - 40,
+  //             width: 40,
+  //             height: 40
+  //           },
+  //           clickable: true
+  //         }]
+  //       }
+  //     })
+  //   }
+  // }
 }
 </script>
 
