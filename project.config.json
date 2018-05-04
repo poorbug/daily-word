@@ -11,7 +11,7 @@
 	"compileType": "miniprogram",
 	"appid": "wx2575bdca2e6d1f2a",
 	"projectname": "daily-word",
-	"libVersion": "2.0.0",
+	"libVersion": "1.9.98",
 	"condition": {
 		"search": {
 			"current": -1,

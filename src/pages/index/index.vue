@@ -7,10 +7,10 @@
     <ul class="list" v-else>
       <activity v-for="(o, i) in list" :key="i" :name="o.name" :people="o.people_amount" :id="o.id" />
     </ul>
-    <button @click="inputName" />
+    <img src="/static/image/add.png" @click="inputName" />
     <div v-if="showInputer" class="inputer">
       <div>
-        <span @click="closeInputer" />
+        <img src="/static/image/close.png" @click="closeInputer" />
         <input v-model="name" />
         <button @click="add" :disabled="!name">提交</button>
       </div>
