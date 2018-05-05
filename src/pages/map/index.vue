@@ -27,8 +27,9 @@ export default {
       controls: [],
       people: 0,
       name: '',
-      isCreator: false,
-      isJoined: undefined
+      isCreator: undefined,
+      isJoined: undefined,
+      reject: true
     }
   },
   onShareAppMessage (res) {
@@ -40,16 +41,25 @@ export default {
     }
   },
   mounted () {
-    this.getActivity()
-    this.getActivityMembers()
+    this.isCreator = this.$root.$mp.query.isCreator === 'true'
+    this.isJoined = this.$root.$mp.query.isCreator === 'true'
+    this.login()
   },
   computed: {
     ...mapState([ 'user' ])
   },
   methods: {
+    login () {
+      store.commit('login', {
+        success: () => {
+          this.reject = false
+          this.getActivity()
+          this.getActivityMembers()
+        },
+        fail: this.auth
+      })
+    },
     getActivity () {
-      console.log('getActivity')
-      console.log(this)
       new wx.BaaS.TableObject(TABLE_ID.ACTIVITY).get(this.$root.$mp.query.id).then(res => {
         this.name = res.data.name
         if (this.user.openid === res.data.creator_id) this.isCreator = true
@@ -60,26 +70,29 @@ export default {
       }, () => { showErr('获取活动出错') })
     },
     async getActivityMembers () {
-      console.log('getActivityMember')
       const query = new wx.BaaS.Query()
       query.compare('activity_id', '=', this.$root.$mp.query.id)
       new wx.BaaS.TableObject(TABLE_ID.ACTIVITY_MEMBER).setQuery(query).find().then(res => {
         const members = res.data.objects
         this.isJoined = members.some(e => (e.user_id === this.user.openid))
-        this.renderControls(members.some(e => (e.user_id === this.user.openid)))
-        console.log('isJoined: ', members.some(e => (e.user_id === this.user.openid)))
         const coors = getCoordinates(members)
         const center = calcCenter(coors)
-        this.markers = coors.length === 1 ? coors : coors.concat(center)
-        this.polylines = calcLines(coors, center)
+        this.markers = coors.length <= 1 ? coors : coors.concat([center])
+        this.polylines = coors.length <= 1 ? [] : calcLines(coors, center)
       }, () => { showErr('获取成员出错') })
     },
     join () {
+      if (this.reject) {
+        this.auth()
+        return
+      }
+      wx.showLoading({ title: '提交中...', mask: true })
       store.dispatch('saveMember', {
         activityId: this.$root.$mp.query.id,
         callback: () => {
+          wx.hideLoading()
           this.isJoined = true
-          this.renderControls(true)
+          this.getActivityMembers()
         }
       })
     },
@@ -88,11 +101,12 @@ export default {
         showErr('你是创建者!')
         return
       }
+      wx.showLoading({ title: '提交中...', mask: true })
       store.dispatch('delMember', {
         activityId: this.$root.$mp.query.id,
         callback: () => {
+          wx.hideLoading()
           this.isJoined = false
-          this.renderControls(false)
           wx.navigateBack()
         }
       })
@@ -108,8 +122,12 @@ export default {
         default:
       }
     },
-    renderControls (val) {
-      console.log('render: ', val)
+    auth () {
+      store.dispatch('auth', { callback: this.login })
+    }
+  },
+  watch: {
+    isJoined: function (val) {
       wx.getSystemInfo({
         success: (res) => {
           this.controls = [{
@@ -127,28 +145,6 @@ export default {
       })
     }
   }
-  // watch: {
-  //   isJoined: function (val) {
-  //     console.log('watch: ', val)
-  //     wx.getSystemInfo({
-  //       success: (res) => {
-  //         console.log('watch res: ', res)
-  //         console.log('watch this: ', this)
-  //         this.controls = [{
-  //           id: val ? 2 : 1,
-  //           iconPath: val ? unjoinImg : joinImg,
-  //           position: {
-  //             left: res.windowWidth - 20 - 40,
-  //             top: res.windowHeight - 20 - 40,
-  //             width: 40,
-  //             height: 40
-  //           },
-  //           clickable: true
-  //         }]
-  //       }
-  //     })
-  //   }
-  // }
 }
 </script>
 

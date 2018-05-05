@@ -1,7 +1,7 @@
 <template>
   <li class="activity" @click="toActivity">
       <h1>{{name}}</h1>
-      <p>{{people}} 人</p>
+      <p v-if="people">{{people}} 人</p>
   </li>
 </template>
 
@@ -31,7 +31,10 @@ export default {
   margin: 20rpx 0;
   box-sizing: border-box;
   font-size: 32rpx;
-  display: flex;
+  // display: flex;
   justify-content: space-between;
+  h1 {
+    text-align: center;
+  }
 }
 </style>

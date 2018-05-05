@@ -14,6 +14,7 @@ export const getCoordinate = (m) => ({
 export const getCoordinates = (list) => (list.map(e => (getCoordinate(e))))
 
 export const calcCenter = (list) => {
+  if (list.length < 2) return {}
   const x = list.reduce((sum, e) => (sum + e.longitude), 0) / list.length
   const y = list.reduce((sum, e) => (sum + e.latitude), 0) / list.length
 
@@ -45,7 +46,7 @@ export const calcLines = (list, center) => {
 }
 
 const centerAttr = {
-  iconPath: require('../static/image/people.png'),
+  iconPath: require('../static/image/center.png'),
   width: 30,
   height: 30
 }

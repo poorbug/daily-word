@@ -1,5 +1,4 @@
 <script>
-import store from './store'
 import { CLIENT_ID } from './constant'
 
 export default {
@@ -7,9 +6,6 @@ export default {
     wx.BaaS = requirePlugin('minapp')
     wx.BaaS.wxExtend(wx.login, wx.getUserInfo)
     wx.BaaS.init(CLIENT_ID)
-    wx.BaaS.login().then(res => {
-      store.commit('setUser', res)
-    })
   }
 }
 </script>
