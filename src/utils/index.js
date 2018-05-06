@@ -15,9 +15,10 @@ export const getCoordinates = (list) => (list.map(e => (getCoordinate(e))))
 
 export const calcCenter = (list) => {
   if (list.length < 2) return {}
-  const x = list.reduce((sum, e) => (sum + e.longitude), 0) / list.length
-  const y = list.reduce((sum, e) => (sum + e.latitude), 0) / list.length
-
+  const sortedX = list.sort((a, b) => (a.longitude - b.longitude))
+  const sortedY = list.sort((a, b) => (a.latitude - b.latitude))
+  const x = (sortedX[0].longitude + sortedX.slice(-1).longitude) / 2
+  const y = (sortedY[0].latitude + sortedY.slice(-1).latitude) / 2
   return {
     longitude: x,
     latitude: y,
