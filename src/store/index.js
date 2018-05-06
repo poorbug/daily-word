@@ -39,7 +39,7 @@ const store = new Vuex.Store({
     }
   },
   actions: {
-    saveMember ({ state }, { activityId, callback }) {
+    saveMember ({ state, dispatch }, { activityId, callback }) {
       wx.getLocation({
         type: 'gcj02',
         success: (res) => {
@@ -51,6 +51,18 @@ const store = new Vuex.Store({
           new wx.BaaS.TableObject(TABLE_ID.ACTIVITY_MEMBER).create().set(activityMember).save().then(res => {
             callback && callback()
           }, err => { showErr(err.message) })
+        },
+        fail: () => {
+          wx.hideLoading()
+          dispatch('auth', {
+            activityId,
+            locationCallback: () => {
+              dispatch('saveMember', {
+                activityId,
+                callback
+              })
+            }
+          })
         }
       })
     },
@@ -66,7 +78,7 @@ const store = new Vuex.Store({
         }, err => { showErr(err.message) })
       }, err => { showErr(err.message) })
     },
-    auth (store, { callback }) {
+    auth (store, { userCallback, locationCallback }) {
       wx.showModal({
         title: '授权登录',
         content: '[在哪聚] 需要授权才可定位',
@@ -74,7 +86,10 @@ const store = new Vuex.Store({
           if (res1.confirm) {
             wx.openSetting({ success: (res2) => {
               if (res2.authSetting['scope.userInfo']) {
-                callback && callback()
+                userCallback && userCallback()
+              }
+              if (res2.authSetting['scope.userLocation']) {
+                locationCallback && locationCallback()
               }
             }})
           }

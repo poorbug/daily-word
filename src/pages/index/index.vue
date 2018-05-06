@@ -11,7 +11,7 @@
     <div v-if="showInputer" class="inputer">
       <div>
         <img :src="closeImg" @click="closeInputer" />
-        <input v-model="name" />
+        <input v-model="name" placeholder="活动名称" />
         <button @click="add" :disabled="!name">提交</button>
       </div>
     </div>
@@ -86,7 +86,7 @@ export default {
             this.name = ''
             this.showInputer = false
             wx.hideLoading()
-            store.commit('setList', this.list.concat(res.data))
+            store.commit('requestList')
             wx.navigateTo({
               url: `/pages/map/main?id=${res.data.id}&isCreator=true`
             })
@@ -98,7 +98,7 @@ export default {
       })
     },
     auth () {
-      store.dispatch('auth', { callback: this.login })
+      store.dispatch('auth', { userCallback: this.login })
     }
   }
 }

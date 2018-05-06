@@ -123,7 +123,7 @@ export default {
       }
     },
     auth () {
-      store.dispatch('auth', { callback: this.login })
+      store.dispatch('auth', { userCallback: this.login })
     }
   },
   watch: {
