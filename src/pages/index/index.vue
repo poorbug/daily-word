@@ -45,8 +45,8 @@ export default {
       reject: true
     }
   },
-  created () {
-    this.login()
+  mounted () {
+    store.dispatch('firstBlood', { callback: this.login })
   },
   computed: {
     ...mapState([ 'list', 'user' ])

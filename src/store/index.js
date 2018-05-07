@@ -95,6 +95,29 @@ const store = new Vuex.Store({
           }
         }
       })
+    },
+    firstBlood (store, { callback }) {
+      const key = 'notfirst'
+      wx.getStorage({
+        key,
+        fail: () => {
+          wx.showModal({
+            title: '在哪聚',
+            content: '[ 在哪聚 ] 是一个朋友聚会选择公平聚会地点的应用～创建活动分享给好友，加入即可查看。',
+            showCancel: false,
+            success: () => {
+              callback && callback()
+              wx.setStorage({
+                key,
+                data: true
+              })
+            }
+          })
+        },
+        success: () => {
+          callback && callback()
+        }
+      })
     }
   }
 })

@@ -17,6 +17,7 @@ import { TABLE_ID } from '@/constant/'
 import { showErr, calcCenter, calcLines, getCoordinates } from '@/utils/'
 const joinImg = require('@/static/image/join.png')
 const unjoinImg = require('@/static/image/unjoin.png')
+const refreshImg = require('@/static/image/refresh.png')
 
 export default {
   store,
@@ -43,7 +44,7 @@ export default {
   mounted () {
     this.isCreator = this.$root.$mp.query.isCreator === 'true'
     this.isJoined = this.$root.$mp.query.isCreator === 'true'
-    this.login()
+    store.dispatch('firstBlood', { callback: this.login })
   },
   computed: {
     ...mapState([ 'user' ])
@@ -81,6 +82,23 @@ export default {
         this.polylines = coors.length <= 1 ? [] : calcLines(coors, center)
       }, () => { showErr('获取成员出错') })
     },
+    auth () {
+      store.dispatch('auth', { userCallback: this.login })
+    },
+    controlTap (e) {
+      switch (e.mp.controlId) {
+        case 1:
+          this.join()
+          break
+        case 2:
+          this.unjoin()
+          break
+        case 3:
+          this.refresh()
+          break
+        default:
+      }
+    },
     join () {
       if (this.reject) {
         this.auth()
@@ -111,19 +129,13 @@ export default {
         }
       })
     },
-    controlTap (e) {
-      switch (e.mp.controlId) {
-        case 1:
-          this.join()
-          break
-        case 2:
-          this.unjoin()
-          break
-        default:
+    refresh () {
+      if (this.reject) {
+        this.auth()
+        return
       }
-    },
-    auth () {
-      store.dispatch('auth', { userCallback: this.login })
+      this.getActivity()
+      this.getActivityMembers()
     }
   },
   watch: {
@@ -135,6 +147,16 @@ export default {
             iconPath: val ? unjoinImg : joinImg,
             position: {
               left: res.windowWidth - 20 - 40,
+              top: res.windowHeight - 20 - 40,
+              width: 40,
+              height: 40
+            },
+            clickable: true
+          }, {
+            id: 3,
+            iconPath: refreshImg,
+            position: {
+              left: 20,
               top: res.windowHeight - 20 - 40,
               width: 40,
               height: 40
