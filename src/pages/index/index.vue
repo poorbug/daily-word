@@ -87,9 +87,7 @@ export default {
             this.showInputer = false
             wx.hideLoading()
             store.commit('requestList')
-            wx.navigateTo({
-              url: `/pages/map/main?id=${res.data.id}&isCreator=true`
-            })
+            wx.navigateTo({ url: `/pages/map/main?id=${res.data.id}&isCreator=true` })
           }
         })
       }, err => {

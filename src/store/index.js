@@ -103,7 +103,7 @@ const store = new Vuex.Store({
         fail: () => {
           wx.showModal({
             title: '在哪聚',
-            content: '[ 在哪聚 ] 是一个朋友聚会选择公平聚会地点的应用～创建活动分享给好友，加入即可查看。',
+            content: '[ 在哪聚 ] 是一个朋友聚会选择公平聚会地点的应用～',
             showCancel: false,
             success: () => {
               callback && callback()

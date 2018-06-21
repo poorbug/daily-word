@@ -3,10 +3,15 @@
     <map
       :markers="markers"
       :polyline="polylines"
-      :controls="controls"
       :include-points="markers"
-      @controltap="controlTap"
-    />
+    >
+      <cover-view class="controls">
+        <cover-view class="control" @tap="toHome"><cover-image :src="homeImg" /></cover-view>
+        <cover-view class="control" @tap="refresh"><cover-image :src="refreshImg" /></cover-view>
+        <cover-view v-if="!isJoined" class="control" @tap="join"><cover-image :src="joinImg" /></cover-view>
+        <cover-view v-else class="control" @tap="unjoin"><cover-image :src="unjoinImg" /></cover-view>
+      </cover-view>
+    </map>
   </div>
 </template>
 
@@ -15,9 +20,10 @@ import { mapState } from 'vuex'
 import store from '@/store'
 import { TABLE_ID } from '@/constant/'
 import { showErr, calcCenter, calcLines, getCoordinates } from '@/utils/'
-const joinImg = require('@/static/image/join.png')
-const unjoinImg = require('@/static/image/unjoin.png')
-const refreshImg = require('@/static/image/refresh.png')
+import joinImg from '@/static/image/join.png'
+import unjoinImg from '@/static/image/unjoin.png'
+import refreshImg from '@/static/image/refresh.png'
+import homeImg from '@/static/image/home.png'
 
 export default {
   store,
@@ -25,12 +31,16 @@ export default {
     return {
       markers: [],
       polylines: [],
-      controls: [],
       people: 0,
       name: '',
       isCreator: undefined,
       isJoined: undefined,
-      reject: true
+      reject: true,
+
+      joinImg,
+      unjoinImg,
+      refreshImg,
+      homeImg
     }
   },
   onShareAppMessage (res) {
@@ -76,6 +86,9 @@ export default {
       new wx.BaaS.TableObject(TABLE_ID.ACTIVITY_MEMBER).setQuery(query).find().then(res => {
         const members = res.data.objects
         this.isJoined = members.some(e => (e.user_id === this.user.openid))
+        console.log(this.user.openid)
+        console.log(members)
+        console.log(this.isJoined)
         const coors = getCoordinates(members)
         const center = calcCenter(coors)
         this.markers = coors.length <= 1 ? coors : coors.concat([center])
@@ -84,20 +97,6 @@ export default {
     },
     auth () {
       store.dispatch('auth', { userCallback: this.login })
-    },
-    controlTap (e) {
-      switch (e.mp.controlId) {
-        case 1:
-          this.join()
-          break
-        case 2:
-          this.unjoin()
-          break
-        case 3:
-          this.refresh()
-          break
-        default:
-      }
     },
     join () {
       if (this.reject) {
@@ -126,6 +125,7 @@ export default {
           wx.hideLoading()
           this.isJoined = false
           wx.navigateBack()
+          this.getActivityMembers()
         }
       })
     },
@@ -136,35 +136,9 @@ export default {
       }
       this.getActivity()
       this.getActivityMembers()
-    }
-  },
-  watch: {
-    isJoined: function (val) {
-      wx.getSystemInfo({
-        success: (res) => {
-          this.controls = [{
-            id: val ? 2 : 1,
-            iconPath: val ? unjoinImg : joinImg,
-            position: {
-              left: res.windowWidth - 20 - 40,
-              top: res.windowHeight - 20 - 40,
-              width: 40,
-              height: 40
-            },
-            clickable: true
-          }, {
-            id: 3,
-            iconPath: refreshImg,
-            position: {
-              left: 20,
-              top: res.windowHeight - 20 - 40,
-              width: 40,
-              height: 40
-            },
-            clickable: true
-          }]
-        }
-      })
+    },
+    toHome () {
+      wx.redirectTo({ url: '/pages/index/main' })
     }
   }
 }

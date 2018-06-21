@@ -8,3 +8,26 @@
     height: 100%;
   }
 }
+
+.controls {
+  position: fixed;
+  bottom: 20rpx;
+  width: auto;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 80rpx;
+  display: flex;
+  background-color: white;
+  border-radius: 8rpx;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10rpx;
+  .control {
+    width: 50rpx;
+    height: 50rpx;
+    padding: 0 30rpx;
+    &:not(:last-child) {
+      border-right: 1px solid @border;
+    }
+  }
+}
